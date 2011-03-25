@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Blabbr on</title>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  var socket = new io.Socket();
+  socket.connect();
+  socket.on('connect', function(){
+    alert("Connected!");
+  });
+</script>
+</head>
+<body>
+</body>
+</html>
