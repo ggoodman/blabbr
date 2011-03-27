@@ -4,21 +4,7 @@
 <title>Blabbr on</title>
 <script src="/socket.io/socket.io.js"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
-<style type="text/css">
-#messages {
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  bottom: 1em;
-  overflow-y: auto;
-}
-#input {
-  position: absolute;
-  left: 0; right: 0; bottom: 0;
-  font-size: 200%;
-  height: 1.5em;
-  line-height: 1.5em;
-}
-</style>
+<link rel="stylesheet" type="text/css" href="css/blabber.css" />
 </head>
 <body>
 <ul id="messages">
@@ -90,7 +76,14 @@
       });
       $(this).val('');
     }
-  })
+  });
+  $('.bab-user-hint').live('click', function(e){
+    var $input = $('#input');
+    if (!$input.val()) {
+      $input.val('@' + $(this).text() + ': ').focus();
+    }
+    e.preventDefault();
+  });
 </script>
 </body>
 </html>
