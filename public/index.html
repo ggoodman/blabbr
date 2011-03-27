@@ -4,27 +4,92 @@
 <title>Blabbr on</title>
 <script src="/socket.io/socket.io.js"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
-
+<style type="text/css">
+#messages {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  bottom: 1em;
+  overflow-y: auto;
+}
+#input {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  font-size: 200%;
+  height: 1.5em;
+  line-height: 1.5em;
+}
+</style>
 </head>
 <body>
-<div id="messages" width="100%" height="18em">
-</div>
-<input id="input" width="100%" />
+<ul id="messages">
+</ul>
+<input id="input" />
 <script>
   var socket = new io.Socket();
   socket.connect();
+  
+  function htmlEncode(value){
+    return $('<div/>').text(value).html();
+  }
+  
+  function htmlDecode(value){
+    return $('<div/>').html(value).text();
+  }
+  
+  function systemMessage(client, message) {
+    $("<li>", {
+      class: 'bab-system'
+    })
+      .append('*&nbsp;')
+      .append(userLink(client))
+      .append("&nbsp;" + message)
+      .appendTo('#messages');
+  }
+  
+  function userLink(client) {
+    return $('<a>',{
+      class: 'bab-user-hint',
+      href: '#bab-user-' + client.sid,
+      text: client.name
+    });
+  }
+  
+  function chatMessage(msg) {
+    $("<li>", {
+      class: 'bab-message'
+    })
+      .append(userLink(msg.client))
+      .append("&nbsp;")
+      .append(msg.data.message)
+      .appendTo('#messages');
+  }
 
   socket.on('message', function(msg){
     console.log(msg);
-    $('<p>', {
-      html: "<strong>" + msg.n + "</scrong>" + msg.body
-    }).appendTo('#messages');
+    switch (msg.type) {
+      case 'connect':
+        systemMessage(msg.client, "connected");
+        break;
+      case 'disconnect':
+        systemMessage(msg.client, "disconnected");
+        break;
+      case 'message':
+        chatMessage(msg);
+        break;
+ 
+     }
   });
-  $('#input').change(function(){
-    socket.send({
-      u: 'ggoodman',
-      body: $(this).val()
-    });
+  $('#input').keypress(function(e){
+    var code = e.keyCode || e.charCode || 0;
+    if (code == 10 || code == 13) {
+      socket.send({
+        type: 'message',
+        data: {
+          message: $(this).val()
+        }
+      });
+      $(this).val('');
+    }
   })
 </script>
 </body>

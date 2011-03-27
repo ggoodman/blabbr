@@ -8,42 +8,54 @@ app.configure ->
 app.get '/', (req, res) ->
   res.send 'hello world'
 
-app.listen process.env.C9_PORT
+app.listen(process.env.C9_PORT or 80)
 
 socket = io.listen(app)
 
-chatters = {}
+sessions = {}
 
-randomString = (bits) ->
-  chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+randomString = (len, alphabet) ->
+  alphabet = alphabet or 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  entropy = alphabet.length
   ret = ''
-  while bits > 0
-    rand = Math.floor(Math.random() * 0x100000000)
-    `for (i = 24; i > 0 && bits > 0; i -= 6, bits -= 6) ret += chars[0x3F & rand >>> i]`
-  return ret
-
-class Chatter
-  constructor: (@client) ->
-    @name = ('Blabberer' + randomString(32)) while @name not in chatters
-    
-    @client.on 'message', @handleMessage
-    
-    msg = 
-      u: @name
-      t: 'connection'
-      body: ''
-
-    @client.broadcast msg
-    @client.send msg
-    
-  handleMessage: (msg) =>
-    console.log msg
-    @client.broadcast msg
+  while len > 0
+    ret += alphabet[Math.floor(Math.random() * entropy)]
+    len--
+  ret
 
 socket.on 'connection', (client) ->
-  chatter = new Chatter(client)
-  chatters[chatter.name] = chatter
+  sid = randomString(4, '0123456789')
+  sid = randomString(4, '0123456789') while sid in sessions
+    
+  sessions[sid] = session =
+    sid: sid
+    name: 'Blabber' + sid
   
-  client.on 'disconnection', ->
-    delete chatters[chatter.name]
+  client.broadcast
+    type: 'connect'
+    client: session
   
+  client.on 'disconnect', ->
+    console.log "DISC"
+    client.broadcast
+      type: 'disconnect'
+      client: session
+    
+  client.on 'message', (msg) ->
+    console.log "MESG", msg
+    switch msg.type
+      when 'message'
+        msg.client = session
+        client.broadcast(msg)
+        client.send(msg)
+      when 'rename'
+        if msg.to not in sessions
+          session.name = msg.to
+          sessions[session.name] = session
+          msg.client = session
+          
+          unset sessions[msg.from]
+          
+          client.broadcast msg
+          client.send msg
+
