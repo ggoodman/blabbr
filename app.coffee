@@ -16,7 +16,7 @@ app.configure ->
   app.use auth([
     auth.Facebook({appId: fb.fbAppId, appSecret: fb.fbAppSecret, scope : "email", callback: fb.fbCallback})
   ])
- # app.use express.static(__dirname + '/public')
+  app.use express.static(__dirname + '/public')
   
 app.get '/', (req, res) ->
   req.logout()
@@ -24,8 +24,10 @@ app.get '/', (req, res) ->
 
 app.get '/auth/facebook', (req, res) ->
   req.authenticate ['facebook'], (err, auth) ->
-    console.log arguments...
-    res.redirect '/'
+    if auth
+      res.render 'login_success'
+    else
+      res.render 'login_fail'
 
 app.get '/chat', (req, res) ->
   socket.on 'connection', (client) ->
@@ -66,7 +68,7 @@ app.get '/chat', (req, res) ->
 
 
 app.listen(process.env.C9_PORT or 80)
-socket = io.listen(app)
+#socket = io.listen(app)
 
 randomString = (len, alphabet) ->
   alphabet = alphabet or 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
