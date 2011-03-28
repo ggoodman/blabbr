@@ -8,8 +8,8 @@ fb = require("./fb_creds.js")
 app.configure ->
   app.set 'views', __dirname + '/views'
   app.set 'view engine', 'jade'
-  #app.use express.bodyParser()
-  #app.use express.methodOverride()
+  app.use express.bodyParser()
+  app.use express.methodOverride()
   app.use express.cookieParser()
   app.use express.session
     secret: 'password'
@@ -19,15 +19,18 @@ app.configure ->
   app.use express.static(__dirname + '/public')
   
 app.get '/', (req, res) ->
-  req.logout()
   res.render 'index'
 
 app.get '/auth/facebook', (req, res) ->
   req.authenticate ['facebook'], (err, auth) ->
+<<<<<<< HEAD
     if auth
       res.render 'login_success'
     else
       res.render 'login_fail'
+=======
+    res.render 'login_success'
+>>>>>>> 9c222401c8a06e6b5403d8d970fcefb799a278e8
 
 app.get '/chat', (req, res) ->
   socket.on 'connection', (client) ->
