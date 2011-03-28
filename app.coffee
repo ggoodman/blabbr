@@ -8,24 +8,22 @@ fb = require("./fb_creds.js")
 app.configure ->
   app.set 'views', __dirname + '/views'
   app.set 'view engine', 'jade'
-  #app.use express.bodyParser()
-  #app.use express.methodOverride()
+  app.use express.bodyParser()
+  app.use express.methodOverride()
   app.use express.cookieParser()
   app.use express.session
     secret: 'password'
   app.use auth([
     auth.Facebook({appId: fb.fbAppId, appSecret: fb.fbAppSecret, scope : "email", callback: fb.fbCallback})
   ])
- # app.use express.static(__dirname + '/public')
+  app.use express.static(__dirname + '/public')
   
 app.get '/', (req, res) ->
-  req.logout()
   res.render 'index'
 
 app.get '/auth/facebook', (req, res) ->
   req.authenticate ['facebook'], (err, auth) ->
-    console.log arguments...
-    res.redirect '/'
+    res.render 'login_success'
 
 app.get '/chat', (req, res) ->
   socket.on 'connection', (client) ->
