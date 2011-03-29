@@ -22,3 +22,6 @@
 [submodule "support/oauth"]
 	path = support/oauth
 	url = https://github.com/ciaranj/node-oauth.git
+[submodule "support/coffee-script"]
+	path = support/coffee-script
+	url = https://github.com/jashkenas/coffee-script.git
