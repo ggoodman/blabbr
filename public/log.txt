@@ -1,0 +1,41 @@
+Error: Can't use mutable header APIs after sent.
+    at ServerResponse.getHeader (http.js:542:11)
+    at ServerResponse.header (/home/ubuntu/blabbr/support/express/lib/response.js:227:17)
+    at ServerResponse.send (/home/ubuntu/blabbr/support/express/lib/response.js:65:17)
+    at ServerResponse._render (/home/ubuntu/blabbr/support/express/lib/view.js:360:10)
+    at ServerResponse.render (/home/ubuntu/blabbr/support/express/lib/view.js:218:17)
+    at ServerResponse._render (/home/ubuntu/blabbr/support/express/lib/view.js:350:10)
+    at ServerResponse.render (/home/ubuntu/blabbr/support/express/lib/view.js:218:17)
+    at /home/ubuntu/blabbr/app.coffee:41:20
+    at /home/ubuntu/blabbr/support/connect-auth/lib/index.js:95:41
+    at next (/home/ubuntu/blabbr/support/connect-auth/lib/strategyExecutor.js:45:39)
+Error: Can't set headers after they are sent.
+    at ServerResponse.<anonymous> (http.js:525:11)
+    at ServerResponse.setHeader (/home/ubuntu/blabbr/support/connect/lib/patch.js:44:20)
+    at IncomingMessage.next (/home/ubuntu/blabbr/support/connect/lib/http.js:168:13)
+    at ServerResponse.render (/home/ubuntu/blabbr/support/express/lib/view.js:228:16)
+    at /home/ubuntu/blabbr/app.coffee:41:20
+    at /home/ubuntu/blabbr/support/connect-auth/lib/index.js:95:41
+    at next (/home/ubuntu/blabbr/support/connect-auth/lib/strategyExecutor.js:45:39)
+    at [object Object].pass (/home/ubuntu/blabbr/support/connect-auth/lib/authExecutionScope.js:18:3)
+    at [object Object].halt (/home/ubuntu/blabbr/support/connect-auth/lib/authExecutionScope.js:15:8)
+    at [object Object].redirect (/home/ubuntu/blabbr/support/connect-auth/lib/authExecutionScope.js:23:8)
+Error: Can't set headers after they are sent.
+    at ServerResponse.<anonymous> (http.js:525:11)
+    at ServerResponse.setHeader (/home/ubuntu/blabbr/support/connect/lib/patch.js:44:20)
+    at next (/home/ubuntu/blabbr/support/connect/lib/http.js:168:13)
+    at param (/home/ubuntu/blabbr/support/connect/lib/middleware/router.js:161:13)
+    at pass (/home/ubuntu/blabbr/support/connect/lib/middleware/router.js:163:10)
+    at Object.router [as handle] (/home/ubuntu/blabbr/support/connect/lib/middleware/router.js:169:6)
+    at next (/home/ubuntu/blabbr/support/connect/lib/http.js:204:15)
+    at /home/ubuntu/blabbr/support/connect/lib/middleware/static.js:139:11
+
+http.js:525
+    throw new Error("Can't set headers after they are sent.");
+          ^
+Error: Can't set headers after they are sent.
+    at ServerResponse.<anonymous> (http.js:525:11)
+    at ServerResponse.setHeader (/home/ubuntu/blabbr/support/connect/lib/patch.js:44:20)
+    at next (/home/ubuntu/blabbr/support/connect/lib/http.js:168:13)
+    at next (/home/ubuntu/blabbr/support/connect/lib/http.js:213:9)
+    at /home/ubuntu/blabbr/support/connect/lib/middleware/static.js:139:11

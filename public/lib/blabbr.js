@@ -20,9 +20,10 @@ function systemMessage(client, message) {
 }
 
 function userLink(client) {
+  console.log(client);
   return $('<a>',{
     class: 'bab-user-hint',
-    href: '#bab-user-' + client.sid,
+    href: '#bab-user-' + client.id,
     text: client.name
   });
 }

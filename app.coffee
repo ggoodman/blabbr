@@ -1,6 +1,14 @@
+require.paths.unshift './support'
+
 express = require 'express'
+app = module.exports = express.createServer()
+sys = require('sys')
+fs = require('fs')
+http = require('http')
+
+connect = require 'connect'
 auth = require 'connect-auth'
-app = express.createServer()
+
 io = require 'socket.io'
 
 fb = require("./fb_creds.js")
@@ -13,29 +21,41 @@ app.configure ->
   app.use express.cookieParser()
   app.use express.session
     secret: 'password'
+  app.use express.logger({ format: ':date :remote-addr :method :status :url' })
   app.use auth([
     auth.Facebook({appId: fb.fbAppId, appSecret: fb.fbAppSecret, scope : "email", callback: fb.fbCallback})
   ])
   app.use express.static(__dirname + '/public')
+  app.use app.router
+  #app.use(express.errorHandler())
   
 app.get '/', (req, res) ->
   res.render 'index'
-
+    
 app.get '/auth/facebook', (req, res) ->
   req.authenticate ['facebook'], (err, auth) ->
-    if auth
-      res.render 'login_success'
-    else
-      res.render 'login_fail'
+    res.redirect('/user/first_login') if auth
+    res.redirect('/') if err
+  return
 
+app.get '/logout', (req, res) ->
+  req.logout()
+  res.redirect '/'
+
+app.get '/user/first_login', (req, res) ->
+  req.session.user = req.getAuthDetails().user
+  res.local 'name', req.session.user.name
+  res.render 'first_login'
+
+app.post '/user/first_login', (req, res) ->
+  req.session.user.name = req.param('username')
+  res.redirect '/chat'
+  
 app.get '/chat', (req, res) ->
+  res.render 'chat'
   socket.on 'connection', (client) ->
-    sid = randomString(4, '0123456789')
-    sid = randomString(4, '0123456789') while sid in sessions
-      
-    sessions[sid] = session =
-      sid: sid
-      name: req.getAuthDetails().name
+    
+    session = req.session.user
     
     client.broadcast
       type: 'connect'
@@ -65,17 +85,9 @@ app.get '/chat', (req, res) ->
             client.broadcast msg
             client.send msg
 
+socket = io.listen(app)
 
-app.listen(process.env.C9_PORT or 80)
-#socket = io.listen(app)
-
-randomString = (len, alphabet) ->
-  alphabet = alphabet or 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-  entropy = alphabet.length
-  ret = ''
-  while len > 0
-    ret += alphabet[Math.floor(Math.random() * entropy)]
-    len--
-  ret
-
-
+if not module.parent
+  port = process.env?.C9_PORT or 80
+  app.listen port
+  console.log "Express server listening on port %d", port

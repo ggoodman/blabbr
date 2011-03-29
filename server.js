@@ -1,3 +1,4 @@
 require.paths.unshift('./support');
-require('coffee');
-require('./app');
+
+var coffee = require('coffee-script');
+var app = require('./app');
