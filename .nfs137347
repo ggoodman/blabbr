@@ -25,6 +25,3 @@
 [submodule "support/coffee-script"]
 	path = support/coffee-script
 	url = https://github.com/jashkenas/coffee-script.git
-[submodule "support/stylus"]
-	path = support/stylus
-	url = https://github.com/LearnBoost/stylus.git

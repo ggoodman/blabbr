@@ -1,13 +1,10 @@
-require.paths.unshift './support'
-
-express = require 'express'
+express = require('express')
 app = module.exports = express.createServer()
-sys = require('sys')
-fs = require('fs')
-http = require('http')
 
-connect = require 'connect'
-auth = require 'connect-auth'
+
+connect = require('connect')
+auth = require('connect-auth')
+stylus = require('stylus')
 
 io = require 'socket.io'
 
@@ -25,6 +22,7 @@ app.configure ->
   app.use auth([
     auth.Facebook({appId: fb.fbAppId, appSecret: fb.fbAppSecret, scope : "email", callback: fb.fbCallback})
   ])
+  app.use stylus.middleware({ src: __dirname + '/public' })
   app.use express.static(__dirname + '/public')
   app.use app.router
   #app.use(express.errorHandler())
