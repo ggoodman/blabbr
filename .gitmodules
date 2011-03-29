@@ -7,9 +7,6 @@
 [submodule "support/qs"]
 	path = support/qs
 	url = https://github.com/visionmedia/node-querystring.git
-[submodule "support/coffee"]
-	path = support/coffee
-	url = https://github.com/jashkenas/coffee-script.git
 [submodule "support/mime"]
 	path = support/mime
 	url = https://github.com/bentomas/node-mime.git
