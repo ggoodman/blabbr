@@ -5,6 +5,24 @@ html(lang="en")
     script(type="text/javascript", src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js")
     script(type='text/javascript', src='http://static.ak.fbcdn.net/connect/en_US/core.js')
     link(rel='stylesheet',type='text/css',href='http://yui.yahooapis.com/2.8.2r1/build/reset/reset-min.css')
+    link(rel='stylesheet',type='text/css',href='/css/Aristo/jquery-ui-1.8.7.custom.css')
     link(rel="stylesheet",href="/css/blabbr.css")
   body
+    header
+      nav
+        - if (piqAuth)
+          div= piqAuth.name
+        - else
+          div#facebook_login(style='position:relative;float:right;width:200px;padding-top:10px;')
+            div#fb-login.fb_button(style='float:left; background-position: left -188px')                
+              a.fb_button_medium(href='/auth/facebook')
+                span#fb_login_text.fb_button_text Connect with Facebook
+
+      
+      #flash
+        - each messages, type in piqFlash
+          - each msg in messages
+            .flash.ui-widget.ui-widget-header.ui-corner-all(class='ui-state-' + type)= msg
+      script
+        $('.flash').fadeOut(4000);
     != body

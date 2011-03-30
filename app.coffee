@@ -1,7 +1,6 @@
 express = require('express')
 app = module.exports = express.createServer()
 
-
 connect = require('connect')
 auth = require('connect-auth')
 stylus = require('stylus')
@@ -22,23 +21,16 @@ app.configure ->
   app.use auth([
     auth.Facebook({appId: fb.fbAppId, appSecret: fb.fbAppSecret, scope : "email", callback: fb.fbCallback})
   ])
+  app.use require('./middleware/user')
+  app.use require('./middleware/flash')
   app.use stylus.middleware({ src: __dirname + '/public' })
   app.use express.static(__dirname + '/public')
-  app.use app.router
-  #app.use(express.errorHandler())
+  app.use(express.errorHandler())
   
 app.get '/', (req, res) ->
+  res.local 'flash', req.flash()
   res.render 'index'
-    
-app.get '/auth/facebook', (req, res) ->
-  req.authenticate ['facebook'], (err, auth) ->
-    res.redirect('/user/first_login') if auth
-    res.redirect('/') if err
-  return
 
-app.get '/logout', (req, res) ->
-  req.logout()
-  res.redirect '/'
 
 app.get '/user/first_login', (req, res) ->
   req.session.user = req.getAuthDetails().user
@@ -84,8 +76,3 @@ app.get '/chat', (req, res) ->
             client.send msg
 
 socket = io.listen(app)
-
-if not module.parent
-  port = process.env?.C9_PORT or 80
-  app.listen port
-  console.log "Express server listening on port %d", port

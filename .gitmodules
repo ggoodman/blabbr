@@ -28,3 +28,6 @@
 [submodule "support/stylus"]
 	path = support/stylus
 	url = https://github.com/LearnBoost/stylus.git
+[submodule "support/browserify"]
+	path = support/browserify
+	url = https://github.com/substack/node-browserify.git
