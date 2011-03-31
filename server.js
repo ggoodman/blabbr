@@ -1,4 +1,4 @@
-require.paths.unshift('./support');
+require.paths.unshift('./vendor');
 
 var coffee = require('coffee-script');
 exports.app = app = require('./app');

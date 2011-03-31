@@ -5,7 +5,8 @@ connect = require('connect')
 auth = require('connect-auth')
 stylus = require('stylus')
 
-io = require 'socket.io'
+browserify = require('browserify')
+dnode = require('dnode')
 
 fb = require("./fb_creds.js")
 
@@ -19,60 +20,35 @@ app.configure ->
     secret: 'password'
   app.use express.logger({ format: ':date :remote-addr :method :status :url' })
   app.use auth([
-    auth.Facebook({appId: fb.fbAppId, appSecret: fb.fbAppSecret, scope : "email", callback: fb.fbCallback})
+    auth.Facebook({appId: fb.id, appSecret: fb.secret, scope : "email", callback: fb.callback})
   ])
   app.use require('./middleware/user')
   app.use require('./middleware/flash')
   app.use stylus.middleware({ src: __dirname + '/public' })
   app.use express.static(__dirname + '/public')
-  app.use(express.errorHandler())
+  app.use browserify({
+    require: ['dnode', 'backbone']
+    mount: '/browserify.js'
+    base: [__dirname + '/browserify', __dirname + '/models']
+    entry: __dirname + '/entry.js'
+  })
+  app.use express.errorHandler()
   
 app.get '/', (req, res) ->
   res.local 'flash', req.flash()
   res.render 'index'
-
-
-app.get '/user/first_login', (req, res) ->
-  req.session.user = req.getAuthDetails().user
-  res.local 'name', req.session.user.name
-  res.render 'first_login'
-
-app.post '/user/first_login', (req, res) ->
-  req.session.user.name = req.param('username')
-  res.redirect '/chat'
   
-app.get '/chat', (req, res) ->
-  res.render 'chat'
-  socket.on 'connection', (client) ->
+class Spine
+  constructor: ->
+    @dnode = require('dnode')(arguments...)
+    @dnode.use @server
+    @dnode.listen(app)
     
-    session = req.session.user
+    console.log "Dnode server started"
+  
+  server: (client, conn) ->
+    @notify = (data, cb) ->
+      console.log "Msg recieved", data
+    return
     
-    client.broadcast
-      type: 'connect'
-      client: session
-    
-    client.on 'disconnect', ->
-      console.log "DISC"
-      client.broadcast
-        type: 'disconnect'
-        client: session
-      
-    client.on 'message', (msg) ->
-      console.log "MESG", msg
-      switch msg.type
-        when 'message'
-          msg.client = session
-          client.broadcast(msg)
-          client.send(msg)
-        when 'rename'
-          if msg.to not in sessions
-            session.name = msg.to
-            sessions[session.name] = session
-            msg.client = session
-            
-            unset sessions[msg.from]
-            
-            client.broadcast msg
-            client.send msg
-
-socket = io.listen(app)
+spine = new Spine()

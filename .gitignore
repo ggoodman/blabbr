@@ -2,3 +2,6 @@ nodemon-ignore
 .monitor
 fb_creds.js
 .nfs*
+.settings.xml
+nohup.out
+*.log
