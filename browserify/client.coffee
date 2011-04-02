@@ -1,9 +1,3 @@
-dnode = require('dnode')
-Backbone = require('backbone')
-User = require('./user')
+now = require('now')
 
-console.log new User
-  name: "Geoffrey Goodman"
-  
-dnode.connect (server) ->
-  server.notify "Message from the future"
+alert now.addTen(10)

@@ -1,3 +1,0 @@
-[submodule "vendor/dnode"]
-	path = vendor/dnode
-	url = https://github.com/substack/dnode.git
