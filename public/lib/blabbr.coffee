@@ -1,17 +1,22 @@
-$ = require('jquery')
-$ ->
-  $('#input').change ->
-    live.send 'relay', $('#input').val()
+Chat = require('./chat')
 
-live = require('./live').client()
-  .expose
-    serverMessage: (name, message) ->
-      console.log "*** #{name} #{message}" 
-    talk: (name, message) ->
-      $('<dt>', {text: name}).appendTo('#chat')
-      $('<dd>', {text: message}).appendTo('#chat')
-    getName: (cb) ->
-      name = prompt("What is your name")
-      if name then cb(false, name)
-      else cb(true)
-    
+
+$ ->
+  chat = new Chat()
+  ###
+  if false#first_login
+    handleSubmit = ->
+      alert $('#first-login-username').val()
+      $(this).dialog('close')
+    handleCancel = ->
+      $(this).dialog('close')
+      
+    $('#first-login').dialog
+      modal: true
+      title: "Set username"
+      buttons:
+        "OK": -> handleSubmit.call(this)
+        "Cancel": -> handleCancel.call(this)
+      keypress: (e) ->
+        handleSubmit.call(this) if e.keyCode in [10, 13]
+  ###

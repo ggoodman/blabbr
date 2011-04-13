@@ -2,27 +2,13 @@
 html(lang="en")
   head
     title="Blabbr on"
+    script(type='text/javascript', src='http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js')
+    script(type='text/javascript', src='http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/jquery-ui.min.js')
     script(type='text/javascript', src='/browserify.js')
-    script(type='text/javascript', src='/nowjs/now.js')
     script(type='text/javascript', src='/lib/blabbr.js')
     link(rel='stylesheet',type='text/css',href='http://yui.yahooapis.com/2.8.2r1/build/reset/reset-min.css')
     link(rel='stylesheet',type='text/css',href='/css/Aristo/jquery-ui-1.8.7.custom.css')
     link(rel="stylesheet",href="/css/blabbr.css")
 
   body
-    #fb-root
-    script(type='text/javascript', src='http://static.ak.fbcdn.net/connect/en_US/core.js')
-    script
-      FB.init({ 
-        appId:'109494285800543', cookie:true, 
-        status:true, xfbml:true 
-      });
-
-    header
-      nav
-        - if (currentUser)
-          div= currentUser.name
-        - else
-          fb:login-button(perms="email") Login with Facebook
-
     != body
