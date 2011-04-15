@@ -1,6 +1,7 @@
 Queue = require('./queue')
 dnode = require('dnode')
 backbone = require('backbone')
+#lumbar = require('./lumbar')
     
 
 class CollectionSyncer
@@ -122,50 +123,15 @@ class Lumbar
       console.log "server.refresh", this, arguments...
     
   sync: (model, options) =>
+    syncer = null
     if model instanceof backbone.Collection
       syncer = new CollectionSyncer(model, options)
-      @connectQueue.add (client) ->
-        syncer.flush(client)
     else if model instanceof backbone.Model
       syncer = new ModelSyncer(model, options)
-      @connectQueue.add (client) ->
-        syncer.flush(client)
-      
-    
-    ###
-    self = this
-    model.class = options.class
-    model.bind 'add', (model) ->
-      self.connectQueue.add (client) ->
-        model.bind 'change', (model) ->
-          console.log "Model change detected!", arguments...
-          client.update(model)
-    
-    model.sync = (method, model, success, error) ->
-      console.log "[Model.sync]", arguments...
-           
-      if model instanceof backbone.Collection and method == 'read'
-        self.connectQueue.add (client) ->
-          console.log "[REFRESH]", method, model
-          client.refresh model.class,
-            success: (data) ->
-              model.refresh(data)
-            error: error
-            add: ->
-              model.add(arguments...)
-            remove: ->
-              model.remove(arguments...)
-            change: (data) ->
-              model.get(data.id).set(data, {silent: true})
-              
-            
-      else
-        self.connectQueue.add (client) ->
-          console.log "[{#method}]", method, model
-          client[method](model.class, model.toJSON())
-      return
-    ###
-        
+    else
+      throw "Lumbar can only synchronize Backbone.Collection and Backbone.Model instances"
+    @connectQueue.add (client) ->
+      syncer.flush(client)
       
 lumbar = module.exports = new Lumbar
 
@@ -182,7 +148,10 @@ class Messages extends backbone.Collection
 
 class Chatter extends backbone.Model
   initialize: ->
-    @name = prompt("What is your name?") until @name
+    FB.api '/me', (userInfo) =>
+      @set userInfo
+      @set {name: prompt("What is your name?")} until @get('name')
+
 
 class ChatMessage extends backbone.View
   tagName: 'li'
@@ -199,7 +168,9 @@ class ChatMessage extends backbone.View
       console.log "New mode", @model.attributes
     
   render: =>
-    $(@el).text(@model.get('name') + ": " + @model.get('message'))
+    $img = $('<img>', src: 'http://graph.facebook.com/' + @model.get('uid') + '/picture')
+    $span = $('<span>', text: @model.get('name') + ": " + @model.get('message'))
+    $(@el).append($img).append($span)
     return this
     
 class ChatApp extends backbone.View
@@ -223,14 +194,23 @@ class ChatApp extends backbone.View
   
   refreshMessages: (messages) =>
     console.log "ChatApp.refreshMessages", messages
-    messages.each @displayMessage
+    $div = $('<div>')
+    messages.each (message) ->
+      view = new ChatMessage(model: message)
+      $div.append(view.render().el)
+    @history
+      .html($div.contents())
+      .parent().scrollTop(@history.height() - @history.parent().height())
+    
+    delete $div
+    
     return
   
   displayMessage: (message) =>
     console.log "ChatApp.displayMessage", message
     msgView = new ChatMessage(model: message)
     @history
-      .append(msgView.render().el)
+      .append($(msgView.render().el).fadeIn())
       .parent().scrollTop(@history.height() - @history.parent().height())
     return this
   
@@ -239,7 +219,8 @@ class ChatApp extends backbone.View
     if e.keyCode == 10 or e.keyCode == 13
       console.log "ChatApp.handlePostMessage", arguments...
       @messages.create
-        name: @chatter.name
+        name: @chatter.get('name')
+        uid: @chatter.get('id')
         message: $('#input').val()
       
       $('#input').val('').focus()

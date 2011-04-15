@@ -4,6 +4,7 @@ html(lang="en")
     title="Blabbr on"
     script(type='text/javascript', src='http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js')
     script(type='text/javascript', src='http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/jquery-ui.min.js')
+    script(type='text/javascript', src='http://connect.facebook.net/en_US/all.js')
     script(type='text/javascript', src='/browserify.js')
     script(type='text/javascript', src='/lib/blabbr.js')
     link(rel='stylesheet',type='text/css',href='http://yui.yahooapis.com/2.8.2r1/build/reset/reset-min.css')
@@ -11,4 +12,17 @@ html(lang="en")
     link(rel="stylesheet",href="/css/blabbr.css")
 
   body
+    #fb-root
+    script
+      FB.init({
+        appId: '#{fb.id}',
+        cookie: true,
+        status: true,
+        xfbml: true
+      });
+    #login.ui-helper-hidden
+      p
+        | In order to interact with
+      fb:login-button(perms="email",show-faces="true")
+        Login with Facebook
     != body

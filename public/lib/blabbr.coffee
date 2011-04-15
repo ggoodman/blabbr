@@ -2,6 +2,12 @@ Chat = require('./chat')
 
 
 $ ->
+  FB.getLoginStatus (response) ->
+    if not response.session
+      $('#login').dialog
+        title: "Please login"
+        modal: true
+
   chat = new Chat()
   ###
   if false#first_login

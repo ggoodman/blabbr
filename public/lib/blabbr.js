@@ -3,6 +3,14 @@
   Chat = require('./chat');
   $(function() {
     var chat;
+    FB.getLoginStatus(function(response) {
+      if (!response.session) {
+        return $('#login').dialog({
+          title: "Please login",
+          modal: true
+        });
+      }
+    });
     return chat = new Chat();
     /*
     if false#first_login

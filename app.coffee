@@ -45,8 +45,13 @@ app.get '/', loadUser, (req, res) ->
   page = req.params.page or 'index'
  
   res.render 'index', locals:
-    page: page
-    currentUser: req.session.currentUser
+    fb: fb
+    session: req.session
+
+app.get '/chat', loadUser, (req, res) ->
+  res.render 'chat', locals:
+    session:
+      user: req.session.currentUser
 
 if not module.parent
   app.listen 80
@@ -118,4 +123,28 @@ iface = (client, conn) ->
   return this  
 
 dnode = require('dnode')
-dnode(iface).listen(app)  
+dnode(iface).listen(app)
+
+schema = 
+  '/type/user':
+    type: "type"
+    name: "User"
+    properties:
+      username: { name: "Username", type: "string", unique: true, required: true }
+      messages: { name: "Messages", type: "/type/messages", unique: false }
+  '/type/message':
+    type: "type"
+    name: "Message"
+    properties:
+      user: { name: "Username", type: "/type/user", unique: true, required: true }
+      body: { name: "Body", type: "string", unique: true, required: true }
+      posted: { name: "Time posted", type: "date", unique: true, required: true }
+
+data = require('data')
+
+graph = new data.Graph(schema)
+graph.set '/user/ggoodman',
+  type: '/type/user'
+  username: 'ggoodman'
+
+console.log "Graph", graph

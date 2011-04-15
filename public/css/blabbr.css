@@ -13,6 +13,15 @@
   bottom: 56px;
   overflow-y: scroll;
 }
+#chat #message-container li {
+  clear: both;
+}
+#chat #message-container li img {
+  float: left;
+}
+#chat #message-container li p {
+  float: left;
+}
 #chat #input {
   font-size: 1.5em;
   position: absolute;

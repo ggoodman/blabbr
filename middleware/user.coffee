@@ -45,7 +45,7 @@ module.exports = (req, res, next) ->
       .exec (err, replies) ->
         console.log "[E] REDIS", arguments... if err
         req.session.currentUser = user
-        res.redirect 'first_login'
+        next()#res.redirect 'first_login'
   
   handleLogin = (user) ->
     client.get "oauth:v1:facebook:#{user.id}", (err, uuid) ->
